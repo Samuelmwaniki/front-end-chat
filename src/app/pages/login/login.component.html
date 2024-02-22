@@ -1,0 +1,13 @@
+<form >
+  <div>
+    <label>username</label>
+    <input type="username" name="username" [(ngModel)]="username" required />
+  </div>
+  <div>
+    <label>Password</label>
+    <input type="password" name="password" [(ngModel)]="password" required />
+  </div>
+  <button type="submit" (click)="login()">
+    <span *ngIf="loading"><ion-spinner></ion-spinner></span>
+    <span *ngIf="!loading">Login</span></button>
+</form>
