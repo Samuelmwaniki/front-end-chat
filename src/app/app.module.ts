@@ -1,16 +1,16 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { RouteReuseStrategy } from '@angular/router';
-
-import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
-
-import { AppComponent } from './app.component';
+import { FormsModule } from '@angular/forms'; // Import FormsModule
+import { IonicModule } from '@ionic/angular';
 import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { LoginComponent } from './login/login.component';
+import { RegisterComponent } from './register/register.component';
 
 @NgModule({
-  declarations: [AppComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  declarations: [AppComponent, LoginComponent, RegisterComponent],
+  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FormsModule], // Add FormsModule here
+  providers: [],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
