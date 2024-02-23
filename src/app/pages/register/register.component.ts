@@ -1,22 +1,41 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { Router } from '@angular/router';
+import { ApiService } from 'src/app/services/api.service';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css'],
+  styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent {
-  email: string = ''; // Initialize the property with an empty string
-  password: string = ''; // Initialize the property with an empty string
+  firstname: string = '';
+  lastname: string = '';
+  username: string = '';
+  password: string = '';
+  loading = false;
+  error: string = '';
 
-  
-  constructor() { }
+  constructor(private apiService: ApiService, private router: Router) {}
 
-  register() {
-    // Implement registration logic here
-    console.log('Register submitted');
+  async register() {
+    this.loading = true;
+    this.error = ''; // Clear any previous errors
+
+    try {
+      const res = await this.apiService.post('/register', {
+        firstname: this.firstname,
+        lastname: this.lastname,
+        username: this.username,
+        password: this.password,
+      });
+
+      if (res) {
+        this.router.navigateByUrl('/login');
+      }
+    } catch (error:any) {
+      this.error = error.message || 'An error occurred during registration.';
+    } finally {
+      this.loading = false;
+    }
   }
 }
