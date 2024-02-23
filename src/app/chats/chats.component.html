@@ -1,0 +1,19 @@
+<div class="chat-container">
+  <header class="toolbar">
+    <h2 class="chat-title">Tubonge</h2>
+  </header>
+  <div class="chat-body">
+    <div class="chat-messages">
+      <div *ngFor="let message of messages" class="message">
+        <div class="message-content">{{ message.content }}</div>
+        <div class="message-sender">{{ message.sender }}</div>
+      </div>
+    </div>
+  </div>
+  <footer class="chat-footer">
+    <div class="chat-input">
+      <textarea [(ngModel)]="newMessage" placeholder="Type your message..."></textarea>
+      <button (click)="sendMessage()">Send</button>
+    </div>
+  </footer>
+</div>
