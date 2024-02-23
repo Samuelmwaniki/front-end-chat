@@ -24,7 +24,7 @@ export class LoginComponent {
     this.loading = true;
 
     console.log('Login submitted');
-    const res = await this.apiService.post('login', { username: this.username, password: this.password} )
+    const res = await this.apiService.post('/login', { username: this.username, password: this.password} )
 
     if (res){
       this.router.navigateByUrl(
