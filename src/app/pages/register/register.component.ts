@@ -22,15 +22,15 @@ export class RegisterComponent {
     this.error = ''; // Clear any previous errors
 
     try {
-      const res = await this.apiService.post('/register', {
-        firstname: this.firstname,
-        lastname: this.lastname,
+      const res = await this.apiService.post('users/register', {
+        //firstname: this.firstname,
+       // lastname: this.lastname,
         username: this.username,
         password: this.password,
       });
 
       if (res) {
-        this.router.navigateByUrl('/login');
+        this.router.navigateByUrl('users/login');
       }
     } catch (error:any) {
       this.error = error.message || 'An error occurred during registration.';

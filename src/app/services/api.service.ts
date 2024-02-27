@@ -18,6 +18,6 @@ export class ApiService extends HttpService {
   sendMessage(chat: string) {
     // Assuming you're using an HTTP POST request to send the message
     // Adjust the endpoint URL and request body structure according to your API
-    return this.post('chats', { chat }); // This line is likely causing the error
+    return this.post('/chat', { chat }); // This line is likely causing the error
   }
 }
