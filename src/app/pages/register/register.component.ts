@@ -46,8 +46,13 @@ export class RegisterComponent {
       }
     } catch (error:any) {
       this.error = error.message || 'An error occurred during registration.';
+   //console.error('Error during registration:', error.message);
     } finally {
       this.loading = false;
     }
+  }
+
+ goToLogin() {
+    this.router.navigateByUrl('/login');
   }
 }

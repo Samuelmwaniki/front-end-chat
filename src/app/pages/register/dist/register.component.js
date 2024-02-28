@@ -99,6 +99,9 @@ var RegisterComponent = /** @class */ (function () {
             });
         });
     };
+    RegisterComponent.prototype.goToLogin = function () {
+        this.router.navigateByUrl('/login');
+    };
     RegisterComponent = __decorate([
         core_1.Component({
             selector: 'app-register',
