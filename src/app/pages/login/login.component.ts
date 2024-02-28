@@ -1,8 +1,5 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
 import { ApiService } from 'src/app/services/api.service';
 
 @Component({
@@ -14,30 +11,29 @@ export class LoginComponent {
   username: string = '';
   password: string = '';
   loading = false;
+  error: string = '';
 
-  constructor(
-     private apiService: ApiService, 
-    private router: Router) { }
+  constructor(private apiService: ApiService, private router: Router) {}
 
   async login() {
-    // Implement login logic here
     this.loading = true;
+    this.error = ''; // Clear any previous errors
 
-    console.log('Login submitted');
-    const res = await this.apiService.post('users/login', { username: this.username, password: this.password} )
+    try {
+      const res = await this.apiService.post('users/login', { username: this.username, password: this.password });
 
-    if (res){
-      this.router.navigateByUrl(
-        '/chat'
-      )
-      
+      if (res) {
+        // Redirect to chat page after successful login
+        this.router.navigateByUrl('/chat');
+      }
+    } catch (error) {
+      this.error = 'Invalid username or password. Please try again.'; // Set error message for wrong credentials
+    } finally {
+      this.loading = false;
     }
-    // save jwt to localstorage
-    this.loading = false;
-    
   }
-  goToRegister(): void {
+
+  goToRegister() {
     this.router.navigateByUrl('/register');
   }
 }
-

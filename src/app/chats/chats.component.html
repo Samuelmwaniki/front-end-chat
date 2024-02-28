@@ -3,6 +3,13 @@
     <h2 class="chat-title">Tubonge</h2>
   </header>
   <div class="chat-body">
+    <!-- Add dropdown menu for selecting user -->
+    <div class="select-user">
+      <label for="selectedUser">Select User:</label>
+      <select id="selectedUser" [(ngModel)]="selectedUser">
+        <option *ngFor="let user of users" [value]="user.id">{{ user.username }}</option>
+      </select>
+    </div>
     <div class="chat-messages">
       <div *ngFor="let message of messages" class="message">
         <div class="message-content">{{ message.content }}</div>

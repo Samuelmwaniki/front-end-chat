@@ -12,7 +12,7 @@ export class RegisterComponent {
   lastname: string = '';
   username: string = '';
   password: string = '';
-  loading = false;
+  loading = true;
   error: string = '';
 
   constructor(private apiService: ApiService, private router: Router) {}
@@ -23,13 +23,25 @@ export class RegisterComponent {
 
     try {
       const res = await this.apiService.post('users/register', {
-        //firstname: this.firstname,
-       // lastname: this.lastname,
+        firstname: this.firstname,
+        lastname: this.lastname,
         username: this.username,
         password: this.password,
+        
       });
 
+      // Check if registration was successful
       if (res) {
+        // Save user data to localStorage
+        const userData = {
+          firstname: this.firstname,
+         lastname: this.lastname,
+          username: this.username,
+          password: this.password,
+        };
+        localStorage.setItem('userData', JSON.stringify(userData));
+
+        // Redirect to login page after successful registration
         this.router.navigateByUrl('users/login');
       }
     } catch (error:any) {
