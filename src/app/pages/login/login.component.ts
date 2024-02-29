@@ -20,10 +20,15 @@ export class LoginComponent {
     this.error = ''; // Clear any previous errors
 
     try {
-      const res = await this.apiService.post('users/login', { username: this.username, password: this.password });
+      const res:any = await this.apiService.post('users/login', { username: this.username, password: this.password });
+        console.log('res: ', res)
 
       if (res) {
+
+        localStorage.setItem('currentUser', JSON.stringify(res.user))
+        localStorage.setItem('token', res.token);
         // Redirect to chat page after successful login
+
         this.router.navigateByUrl('/chat');
       }
     } catch (error) {
