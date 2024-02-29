@@ -67,7 +67,10 @@ var LoginComponent = /** @class */ (function () {
                         return [4 /*yield*/, this.apiService.post('users/login', { username: this.username, password: this.password })];
                     case 2:
                         res = _a.sent();
+                        console.log('res: ', res);
                         if (res) {
+                            localStorage.setItem('currentUser', JSON.stringify(res.user));
+                            localStorage.setItem('token', res.token);
                             // Redirect to chat page after successful login
                             this.router.navigateByUrl('/chat');
                         }

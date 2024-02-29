@@ -54,13 +54,15 @@ var RegisterComponent = /** @class */ (function () {
         this.password = '';
         this.loading = true;
         this.error = '';
+        this.errorMessage = [];
     }
     RegisterComponent.prototype.register = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var res, userData, error_1;
+            var res, userData, response_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        console.log("WE ARE HERE");
                         this.loading = true;
                         this.error = ''; // Clear any previous errors
                         _a.label = 1;
@@ -74,6 +76,7 @@ var RegisterComponent = /** @class */ (function () {
                             })];
                     case 2:
                         res = _a.sent();
+                        console.log("WE ARE HERE");
                         // Check if registration was successful
                         if (res) {
                             userData = {
@@ -88,8 +91,12 @@ var RegisterComponent = /** @class */ (function () {
                         }
                         return [3 /*break*/, 5];
                     case 3:
-                        error_1 = _a.sent();
-                        this.error = error_1.message || 'An error occurred during registration.';
+                        response_1 = _a.sent();
+                        console.log('STATUS CODE : ', response_1.error);
+                        if (response_1.error.statusCode === 400) {
+                            this.errorMessage = response_1.error.message;
+                        }
+                        console.log('ERRORS : ', this.errorMessage);
                         return [3 /*break*/, 5];
                     case 4:
                         this.loading = false;

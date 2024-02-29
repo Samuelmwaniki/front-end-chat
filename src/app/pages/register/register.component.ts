@@ -14,10 +14,13 @@ export class RegisterComponent {
   password: string = '';
   loading = true;
   error: string = '';
+  errorMessage: any = [];
+
 
   constructor(private apiService: ApiService, private router: Router) {}
 
   async register() {
+    console.log("WE ARE HERE")
     this.loading = true;
     this.error = ''; // Clear any previous errors
 
@@ -30,6 +33,7 @@ export class RegisterComponent {
         
       });
 
+      console.log("WE ARE HERE")
       // Check if registration was successful
       if (res) {
         // Save user data to localStorage
@@ -44,8 +48,13 @@ export class RegisterComponent {
         // Redirect to login page after successful registration
         this.router.navigateByUrl('users/login');
       }
-    } catch (error:any) {
-      this.error = error.message || 'An error occurred during registration.';
+    } catch (response:any) {
+      console.log('STATUS CODE : ', response.error);
+      if(response.error.statusCode === 400) {
+        this.errorMessage = response.error.message;
+      }
+
+      console.log('ERRORS : ', this.errorMessage);
    //console.error('Error during registration:', error.message);
     } finally {
       this.loading = false;
