@@ -1,27 +1,34 @@
 <div class="container">
+
   <form (ngSubmit)="register()" class="form">
     <h2 class="form-title">Register</h2>
-     <div class="form-group"> 
+    <div class="form-group"> 
       <label for="firstname">First Name:</label>
-      <input type="text" id="firstname" name="firstname" [(ngModel)]="firstname" required
-       [ngClass]="{ 'is-invalid': !firstname }">
-      <div *ngIf="!firstname" class="error-message">firstname is required.</div>
+
+      <input type="text" id="firstname" name="firstname" [(ngModel)]="firstname" required minlength="4">
+        
+      
       
     </div>
-   
-   <div class="form-group">
-      <label for="lastname">Last Name:</label>
-      <input type="text" id="lastname" name="lastname" [(ngModel)]="lastname" required
-      [ngClass]="{ 'is-invalid': !lastname }">
-      <div *ngIf="!lastname" class="error-message">lastname is required.</div>
-    </div> 
+    <div class="form-group">
 
+      <label for="lastname">Last Name:</label>
+
+      <input type="text" id="lastname" name="lastname" [(ngModel)]="lastname" required minlength="4" maxlength="50"
+  [ngClass]="{ 'is-invalid': lastname && lastname.length < 5 }">
+          <div *ngIf="lastname && lastname.length < 5" class="error-message">username must be at least 5 characters.</div>
+            <div  [ngClass]="{ 'is-invalid': !lastname }">
+      <div *ngIf="!lastname" class="error-message">lastname is required.</div>
+    </div>
+      
+    </div> 
     <div class="form-group">
       <label for="username">Username:</label>
-      <input type="text" id="username" name="username" [(ngModel)]="username" required
-        [ngClass]="{ 'is-invalid': !username }">
-           <div *ngIf="!username" class="error-message">username is required.</div>
-
+      <input type="text" id="username" name="username" [(ngModel)]="username" required minlength="4"
+          [ngClass]="{ 'is-invalid': username && username.length < 5 }">
+          <div *ngIf="username && username.length < 5" class="error-message">username must be at least 5 characters.</div>
+            <div  [ngClass]="{ 'is-invalid': !username }">
+      <div *ngIf="!username" class="error-message">Username is required.</div>
     </div>
     <div class="form-group">
       <label for="password">Password:</label>
@@ -33,7 +40,8 @@
     <button type="submit">Register</button>
     <p style="color:green;">You have an existing account?</p>
     <hr>
-    <button type="submit" (click)="goToLogin()" class="register-btn">Login</button>
-    <!-- <button type="submit">Login</button> -->
+    <button type="button" (click)="goToLogin()" class="register-btn">Login</button>
+   </div>
   </form>
-</div>
+
+  <div *ngIf="errorMessage">{{errorMessage}}</div>
