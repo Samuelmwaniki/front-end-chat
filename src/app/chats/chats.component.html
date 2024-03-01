@@ -1,19 +1,27 @@
 <div class="chat-container">
   <header class="toolbar">
-    <h2 class="chat-title">Tubonge</h2>
+    <img src="https://images.squarespace-cdn.com/content/v1/58a1a2bb9f745664e6b41612/1597057412838-T3UTOLKZII99Q0OUGPK5/Sauti+Ya+Mtaa.jpg" alt="Tubonge Logo" class="logo">
+    <button type="button" (click)="goToLogin()" class="register-btn">Logout</button>
   </header>
   <div class="chat-body">
-    <!-- Add dropdown menu for selecting user -->
-    <div class="select-user">
-      <label for="selectedUser">Select User:</label>
-      <select id="selectedUser" [(ngModel)]="selectedUser">
-        <option *ngFor="let user of users" [value]="user.id">{{ user.username }}</option>
-      </select>
-    </div>
+    <!-- Add dropdown menu for selecting users -->
+   <div class="select-user">
+  <label for="selectedUser" style="color:#007bff ;">Chat with:</label>
+  <select id="selectedUser" [(ngModel)]="selectedUserId" (change)="onSelectedUserChanged()">
+    <option *ngFor="let user of users" [value]="user._id">{{ user.username }}</option>
+  </select>
+</div>
+
+<div *ngIf="selectedUser._id" class="chat-message">
+  <p>Chatting with: {{ selectedUser.username }}</p>
+</div>
+
     <div class="chat-messages">
-      <div *ngFor="let message of messages" class="message">
-        <div class="message-content">{{ message.content }}</div>
-        <div class="message-sender">{{ message.sender }}</div>
+      <div *ngFor="let message of messages; index as messageIndex" class="message-container" [ngClass]="{'left': indexIsEven(messageIndex), 'right': !indexIsEven(messageIndex) }">
+        <div class="message">
+          <div class="message-content">{{ message.chat }}</div>
+          <div class="message-sender">~{{ message.sender.username }}</div>
+        </div>
       </div>
     </div>
   </div>

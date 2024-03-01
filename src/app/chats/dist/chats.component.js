@@ -50,8 +50,10 @@ var ChatsComponent = /** @class */ (function () {
         this.router = router;
         this.messages = [];
         this.newMessage = '';
+        this.currentUser = {};
         this.users = [];
-        this.selectedUser = null;
+        this.selectedUserId = '';
+        this.selectedUser = {};
     }
     ChatsComponent.prototype.ngOnInit = function () {
         // Fetch initial messages from sessionStorage when component initializes
@@ -63,42 +65,65 @@ var ChatsComponent = /** @class */ (function () {
         if (!token) {
             this.router.navigateByUrl('/login');
         }
-        // Fetch users for dropdown menu
-        //   this.apiService.getUsers().subscribe((users: User[]) => {
-        //     this.users = users;
-        //   });
-        // }
-        var user = localStorage.getItem("currentUser");
-        if (user) {
-            this.getUsers(user);
-        }
+        this.currentUser = JSON.parse(localStorage.getItem("currentUser") || '');
+        this.getUsers();
     };
-    ChatsComponent.prototype.getUsers = function (user) {
+    ChatsComponent.prototype.getUsers = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var currentUser, res;
+            var res;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        currentUser = JSON.parse(user);
+                        if (!this.currentUser) return [3 /*break*/, 2];
                         return [4 /*yield*/, this.apiService.get('users')];
                     case 1:
                         res = _a.sent();
-                        console.log('users: ', res);
-                        this.users = res.filter(function (user) { return user._id !== currentUser._id; });
-                        console.log('users 2: ', this.users);
-                        return [2 /*return*/];
+                        this.users = res.filter(function (user) { return user._id !== _this.currentUser._id; });
+                        return [3 /*break*/, 3];
+                    case 2:
+                        console.log("Could not find current user");
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
                 }
             });
         });
     };
     ChatsComponent.prototype.sendMessage = function () {
+        console.log('Selected ', this.selectedUser, this.currentUser);
         if (this.newMessage.trim() !== '' && this.selectedUser !== null) {
             // Simulate sending message to backend and receiving response
-            var newMessage = { sender: 'Me', content: this.newMessage };
+            var newMessage = {
+                sender: this.currentUser,
+                recepient: this.selectedUser,
+                _id: (new Date()).getUTCDate(),
+                chat: this.newMessage,
+                timestamp: new Date()
+            };
             this.messages.push(newMessage);
             // Store updated messages in sessionStorage
             sessionStorage.setItem('messages', JSON.stringify(this.messages));
             this.newMessage = ''; // Clear input field after sending message
+        }
+    };
+    ChatsComponent.prototype.onSelectedUserChanged = function () {
+        var _this = this;
+        if (this.selectedUserId) {
+            this.selectedUser = this.users.find(function (user) { return user._id === _this.selectedUserId; });
+        }
+        else {
+            this.selectedUser = {};
+        }
+    };
+    ChatsComponent.prototype.goToLogin = function () {
+        this.router.navigateByUrl('/login');
+    };
+    ChatsComponent.prototype.indexIsEven = function (index) {
+        if (typeof (index) === "number") {
+            return (index % 2 === 0);
+        }
+        else {
+            return false;
         }
     };
     ChatsComponent = __decorate([

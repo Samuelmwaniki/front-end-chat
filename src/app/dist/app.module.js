@@ -20,6 +20,7 @@ var register_component_1 = require("./pages/register/register.component");
 var common_1 = require("@angular/common");
 var forms_1 = require("@angular/forms");
 var chats_component_1 = require("./chats/chats.component");
+var web_socket_service_1 = require("./services/web-socket.service"); // Import WebSocketService
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -27,7 +28,7 @@ var AppModule = /** @class */ (function () {
         core_1.NgModule({
             declarations: [app_component_1.AppComponent, login_component_1.LoginComponent, register_component_1.RegisterComponent, chats_component_1.ChatsComponent],
             imports: [common_1.CommonModule, forms_1.FormsModule, forms_1.ReactiveFormsModule, http_1.HttpClientModule, platform_browser_1.BrowserModule, angular_1.IonicModule.forRoot(), app_routing_module_1.AppRoutingModule],
-            providers: [http_service_1.HttpService, api_service_1.ApiService],
+            providers: [http_service_1.HttpService, api_service_1.ApiService, web_socket_service_1.WebSocketService],
             bootstrap: [app_component_1.AppComponent]
         })
     ], AppModule);

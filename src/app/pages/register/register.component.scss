@@ -56,4 +56,17 @@ button[type="submit"]:hover {
 .error-message {
   color: red;
   font-size: 0.8rem;
+}.register-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.logo {
+  max-width: 100px; /* Set a maximum width for your logo image */
+  height: auto;  /* Maintain aspect ratio */
 }
