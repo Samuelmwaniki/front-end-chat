@@ -1,12 +1,16 @@
 <div class="container">
 
   <form (ngSubmit)="register()" class="form">
+    
     <h2 class="form-title">Register</h2>
     <div class="form-group"> 
       <label for="firstname">First Name:</label>
 
-      <input type="text" id="firstname" name="firstname" [(ngModel)]="firstname" required minlength="4">
-        
+      <input type="text" id="firstname" name="firstname" [(ngModel)]="firstname" required minlength="4"
+        [ngClass]="{ 'is-invalid': firstname && firstname.length < 5 }">
+          <div *ngIf="firstname && firstname.length < 5" class="error-message">firstname must be at least 5 characters.</div>
+            <div  [ngClass]="{ 'is-invalid': !firstname }"></div>
+      <div *ngIf="!firstname" class="error-message">firstname is required.</div>
       
       
     </div>
@@ -19,9 +23,9 @@
           <div *ngIf="lastname && lastname.length < 5" class="error-message">username must be at least 5 characters.</div>
             <div  [ngClass]="{ 'is-invalid': !lastname }">
       <div *ngIf="!lastname" class="error-message">lastname is required.</div>
-    </div>
-      
-    </div> 
+  
+            </div>
+  
     <div class="form-group">
       <label for="username">Username:</label>
       <input type="text" id="username" name="username" [(ngModel)]="username" required minlength="4"
@@ -42,6 +46,7 @@
     <hr>
     <button type="button" (click)="goToLogin()" class="register-btn">Login</button>
    </div>
+    </div>
   </form>
 
   <div *ngIf="errorMessage">{{errorMessage}}</div>
