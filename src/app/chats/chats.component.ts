@@ -28,8 +28,52 @@ export class ChatsComponent implements OnInit {
   users: User[] = [];
   selectedUserId: string = '';
   selectedUser: User = {} as any;
+ 
+  error:string=''
 
   constructor(private apiService: ApiService, private router: Router) { }
+async sendMessage() {
+  console.log("message send");
+
+  this.error = '';
+  try {
+    const payload = {
+      sender: this.currentUser._id,
+      recipient: this.selectedUser._id,
+      message: this.newMessage,
+    };
+    console.log('payload', payload);
+    const res = await this.apiService.post('chat/bulk', payload);
+
+    if (res) {
+
+      const chat =
+       {
+        _id: this.selectedUserId,
+        sender: this.currentUser,
+        recipient: this.selectedUser,
+        message: this.newMessage
+       };
+
+       
+
+        localStorage.setItem('chat', JSON.stringify(chat));
+       }
+
+  } 
+  catch (error:any) {
+
+    console.log('Error:', error);
+
+    if (error.response && error.response.status === 400) {
+      
+      console.log('STATUS CODE : ', error.response.status);
+      // handle 400 status code error
+    }
+  }
+}
+
+
 
   ngOnInit(): void {
     // Fetch initial messages from sessionStorage when component initializes
@@ -40,7 +84,7 @@ export class ChatsComponent implements OnInit {
 
     const token = localStorage.getItem("token");
     if (!token) {
-      this.router.navigateByUrl('/login')
+      
     }
 
     this.currentUser = JSON.parse(localStorage.getItem("currentUser") || '');
@@ -57,25 +101,25 @@ export class ChatsComponent implements OnInit {
     }
   }
 
-  sendMessage(): void {
-    console.log('Selected ', this.selectedUser, this.currentUser)
-    if (this.newMessage.trim() !== '' && this.selectedUser !== null) {
-      // Simulate sending message to backend and receiving response
-      const newMessage: Message = { 
-        sender: this.currentUser, 
-        recepient: this.selectedUser,
-        _id: (new Date()).getUTCDate(),
-        chat: this.newMessage,
-        timestamp: new Date(),
-      };
-      this.messages.push(newMessage);
+  // sendMesssage(): void {
+  //   console.log('Selected ', this.selectedUser, this.currentUser)
+  //   if (this.newMessage.trim() !== '' && this.selectedUser !== null) {
+  //     // Simulate sending message to backend and receiving response
+  //     const newMessage: Message = { 
+  //       sender: this.currentUser, 
+  //       recepient: this.selectedUser,
+  //       _id: (new Date()).getUTCDate(),
+  //       chat: this.newMessage,
+  //       timestamp: new Date(),
+  //     };
+  //     this.messages.push(newMessage);
 
-      // Store updated messages in sessionStorage
-      sessionStorage.setItem('messages', JSON.stringify(this.messages));
+  //     // Store updated messages in sessionStorage
+  //     sessionStorage.setItem('messages', JSON.stringify(this.messages));
 
-      this.newMessage = ''; // Clear input field after sending message
-    }
-  }
+  //     this.newMessage = ''; // Clear input field after sending message
+  //   }
+  // }
 
   onSelectedUserChanged(){
     if(this.selectedUserId) {

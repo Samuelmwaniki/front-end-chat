@@ -6,7 +6,7 @@
   <div class="chat-body">
     <!-- Add dropdown menu for selecting users -->
    <div class="select-user">
-  <label for="selectedUser" style="color:#007bff ;">Chat with:</label>
+  <label for="selectedUser" style="color:#007bff ;">users:</label>
   <select id="selectedUser" [(ngModel)]="selectedUserId" (change)="onSelectedUserChanged()">
     <option *ngFor="let user of users" [value]="user._id">{{ user.username }}</option>
   </select>
@@ -17,18 +17,22 @@
 </div>
 
     <div class="chat-messages">
-      <div *ngFor="let message of messages; index as messageIndex" class="message-container" [ngClass]="{'left': indexIsEven(messageIndex), 'right': !indexIsEven(messageIndex) }">
-        <div class="message">
-          <div class="message-content">{{ message.chat }}</div>
-          <div class="message-sender">~{{ message.sender.username }}</div>
-        </div>
+  <div *ngFor="let message of messages; index as messageIndex" class="message-container"
+       [ngClass]="{ 'left': indexIsEven(messageIndex), 'right': !indexIsEven(messageIndex) }">
+    <div class="message">
+      <div class="message-content">{{ message.chat }}</div>
+      <div class="message-sender">
+        ~{{ indexIsEven(messageIndex) ? message.sender.username : message.recepient.username }}
       </div>
     </div>
+  </div>
+</div>
   </div>
   <footer class="chat-footer">
     <div class="chat-input">
       <textarea [(ngModel)]="newMessage" placeholder="Type your message..."></textarea>
-      <button (click)="sendMessage()">Send</button>
+      
+      <button type="button" (click)="sendMessage()" class="form"> sendMessage</button>
     </div>
   </footer>
 </div>

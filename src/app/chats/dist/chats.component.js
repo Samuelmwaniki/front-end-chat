@@ -54,7 +54,51 @@ var ChatsComponent = /** @class */ (function () {
         this.users = [];
         this.selectedUserId = '';
         this.selectedUser = {};
+        this.error = '';
     }
+    ChatsComponent.prototype.sendMessage = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var payload, res, chat, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        console.log("message send");
+                        this.error = '';
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        payload = {
+                            sender: this.currentUser._id,
+                            recipient: this.selectedUser._id,
+                            message: this.newMessage
+                        };
+                        console.log('payload', payload);
+                        return [4 /*yield*/, this.apiService.post('chat/bulk', payload)];
+                    case 2:
+                        res = _a.sent();
+                        if (res) {
+                            chat = {
+                                _id: this.selectedUserId,
+                                sender: this.currentUser,
+                                recipient: this.selectedUser,
+                                message: this.newMessage
+                            };
+                            localStorage.setItem('chat', JSON.stringify(chat));
+                        }
+                        return [3 /*break*/, 4];
+                    case 3:
+                        error_1 = _a.sent();
+                        console.log('Error:', error_1);
+                        if (error_1.response && error_1.response.status === 400) {
+                            console.log('STATUS CODE : ', error_1.response.status);
+                            // handle 400 status code error
+                        }
+                        return [3 /*break*/, 4];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
     ChatsComponent.prototype.ngOnInit = function () {
         // Fetch initial messages from sessionStorage when component initializes
         var storedMessages = sessionStorage.getItem('messages');
@@ -63,7 +107,6 @@ var ChatsComponent = /** @class */ (function () {
         }
         var token = localStorage.getItem("token");
         if (!token) {
-            this.router.navigateByUrl('/login');
         }
         this.currentUser = JSON.parse(localStorage.getItem("currentUser") || '');
         this.getUsers();
@@ -89,23 +132,23 @@ var ChatsComponent = /** @class */ (function () {
             });
         });
     };
-    ChatsComponent.prototype.sendMessage = function () {
-        console.log('Selected ', this.selectedUser, this.currentUser);
-        if (this.newMessage.trim() !== '' && this.selectedUser !== null) {
-            // Simulate sending message to backend and receiving response
-            var newMessage = {
-                sender: this.currentUser,
-                recepient: this.selectedUser,
-                _id: (new Date()).getUTCDate(),
-                chat: this.newMessage,
-                timestamp: new Date()
-            };
-            this.messages.push(newMessage);
-            // Store updated messages in sessionStorage
-            sessionStorage.setItem('messages', JSON.stringify(this.messages));
-            this.newMessage = ''; // Clear input field after sending message
-        }
-    };
+    // sendMesssage(): void {
+    //   console.log('Selected ', this.selectedUser, this.currentUser)
+    //   if (this.newMessage.trim() !== '' && this.selectedUser !== null) {
+    //     // Simulate sending message to backend and receiving response
+    //     const newMessage: Message = { 
+    //       sender: this.currentUser, 
+    //       recepient: this.selectedUser,
+    //       _id: (new Date()).getUTCDate(),
+    //       chat: this.newMessage,
+    //       timestamp: new Date(),
+    //     };
+    //     this.messages.push(newMessage);
+    //     // Store updated messages in sessionStorage
+    //     sessionStorage.setItem('messages', JSON.stringify(this.messages));
+    //     this.newMessage = ''; // Clear input field after sending message
+    //   }
+    // }
     ChatsComponent.prototype.onSelectedUserChanged = function () {
         var _this = this;
         if (this.selectedUserId) {
