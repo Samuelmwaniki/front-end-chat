@@ -12,7 +12,7 @@ interface Message {
   _id: number;
   sender: User;
   recepient: User;
-  chat: string;
+  message: string;
   timestamp: Date;
 }
 
@@ -32,46 +32,59 @@ export class ChatsComponent implements OnInit {
   error:string=''
 
   constructor(private apiService: ApiService, private router: Router) { }
-async sendMessage() {
-  console.log("message send");
+  async sendMessage() {
+    console.log("message send");
 
-  this.error = '';
-  try {
-    const payload = {
-      sender: this.currentUser._id,
-      recipient: this.selectedUser._id,
-      message: this.newMessage,
-    };
-    console.log('payload', payload);
-    const res = await this.apiService.post('chat/bulk', payload);
+    this.error = '';
+    try {
+      const payload = {
+        sender: this.currentUser._id,
+        recipient: this.selectedUser._id,
+        message: this.newMessage,
+      };
+      console.log('payload', payload);
+      const res = await this.apiService.post('chats', payload);
 
-    if (res) {
+      if (res) {
+        return await this.fetchChats();
 
-      const chat =
-       {
-        _id: this.selectedUserId,
-        sender: this.currentUser,
-        recipient: this.selectedUser,
-        message: this.newMessage
-       };
+        // const chat =
+        //  {
+        //   _id: this.selectedUserId,
+        //   sender: this.currentUser,
+        //   recipient: this.selectedUser,
+        //   message: this.newMessage
+        //  };
 
-       
+        
 
-        localStorage.setItem('chat', JSON.stringify(chat));
-       }
+        //   localStorage.setItem('chat', JSON.stringify(chat));
+        //  }
+      }
 
-  } 
-  catch (error:any) {
+    } 
+    catch (error:any) {
 
-    console.log('Error:', error);
+      console.log('Error:', error);
 
-    if (error.response && error.response.status === 400) {
-      
-      console.log('STATUS CODE : ', error.response.status);
-      // handle 400 status code error
+      if (error.response && error.response.status === 400) {
+        
+        console.log('STATUS CODE : ', error.response.status);
+        // handle 400 status code error
+      }
     }
   }
-}
+
+  async fetchChats() {
+    await this.apiService.get('chats/?recipientId='+this.selectedUser._id+'&senderId='+this.currentUser._id)
+      .then( ({ data } : any) => {
+        this.messages = data;
+        console.log('MESSAGES : ', this.messages)
+      })
+      .catch( () => {
+        
+      });
+  }
 
 
 
@@ -121,9 +134,12 @@ async sendMessage() {
   //   }
   // }
 
-  onSelectedUserChanged(){
+  async onSelectedUserChanged(){
     if(this.selectedUserId) {
       this.selectedUser = this.users.find((user: User) => user._id === this.selectedUserId) as any;
+
+      console.log('USER CHANGED')
+      await this.fetchChats();
     } else {
       this.selectedUser = {} as any;
     }

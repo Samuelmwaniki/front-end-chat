@@ -58,7 +58,7 @@ var ChatsComponent = /** @class */ (function () {
     }
     ChatsComponent.prototype.sendMessage = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var payload, res, chat, error_1;
+            var payload, res, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -66,35 +66,48 @@ var ChatsComponent = /** @class */ (function () {
                         this.error = '';
                         _a.label = 1;
                     case 1:
-                        _a.trys.push([1, 3, , 4]);
+                        _a.trys.push([1, 5, , 6]);
                         payload = {
                             sender: this.currentUser._id,
                             recipient: this.selectedUser._id,
                             message: this.newMessage
                         };
                         console.log('payload', payload);
-                        return [4 /*yield*/, this.apiService.post('chat/bulk', payload)];
+                        return [4 /*yield*/, this.apiService.post('chats', payload)];
                     case 2:
                         res = _a.sent();
-                        if (res) {
-                            chat = {
-                                _id: this.selectedUserId,
-                                sender: this.currentUser,
-                                recipient: this.selectedUser,
-                                message: this.newMessage
-                            };
-                            localStorage.setItem('chat', JSON.stringify(chat));
-                        }
-                        return [3 /*break*/, 4];
-                    case 3:
+                        if (!res) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.fetchChats()];
+                    case 3: return [2 /*return*/, _a.sent()];
+                    case 4: return [3 /*break*/, 6];
+                    case 5:
                         error_1 = _a.sent();
                         console.log('Error:', error_1);
                         if (error_1.response && error_1.response.status === 400) {
                             console.log('STATUS CODE : ', error_1.response.status);
                             // handle 400 status code error
                         }
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
+                        return [3 /*break*/, 6];
+                    case 6: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    ChatsComponent.prototype.fetchChats = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.apiService.get('chats/?recipientId=' + this.selectedUser._id + '&senderId=' + this.currentUser._id)
+                            .then(function (_a) {
+                            var data = _a.data;
+                            _this.messages = data;
+                            console.log('MESSAGES : ', _this.messages);
+                        })["catch"](function () {
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
                 }
             });
         });
@@ -150,13 +163,25 @@ var ChatsComponent = /** @class */ (function () {
     //   }
     // }
     ChatsComponent.prototype.onSelectedUserChanged = function () {
-        var _this = this;
-        if (this.selectedUserId) {
-            this.selectedUser = this.users.find(function (user) { return user._id === _this.selectedUserId; });
-        }
-        else {
-            this.selectedUser = {};
-        }
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!this.selectedUserId) return [3 /*break*/, 2];
+                        this.selectedUser = this.users.find(function (user) { return user._id === _this.selectedUserId; });
+                        console.log('USER CHANGED');
+                        return [4 /*yield*/, this.fetchChats()];
+                    case 1:
+                        _a.sent();
+                        return [3 /*break*/, 3];
+                    case 2:
+                        this.selectedUser = {};
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
     };
     ChatsComponent.prototype.goToLogin = function () {
         this.router.navigateByUrl('/login');
