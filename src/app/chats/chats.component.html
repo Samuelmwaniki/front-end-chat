@@ -13,21 +13,24 @@
 </div>
 
 <div *ngIf="selectedUser._id" class="chat-message">
-  <p>Chatting with: {{ selectedUser?.username }}</p>
+  <p>Chatting with: {{ selectedUser.username }}</p>
 </div>
-
-    <div class="chat-messages">
+   <div class="chat-messages">
   <div *ngFor="let message of messages; index as messageIndex" class="message-container"
        [ngClass]="{ 'left': indexIsEven(messageIndex), 'right': !indexIsEven(messageIndex) }">
     <div class="message">
       <div class="message-content">{{ message.message }}</div>
-      <div class="message-sender">
-        ~{{ indexIsEven(messageIndex) ? message?.sender?.username : message?.recepient?.username }}
+      <div class="message-sender"> ~{{ currentUser.username }}
+
       </div>
     </div>
   </div>
 </div>
   </div>
+
+  
+  
+  
   <footer class="chat-footer">
     <div class="chat-input">
       <textarea [(ngModel)]="newMessage" placeholder="Type your message..."></textarea>
