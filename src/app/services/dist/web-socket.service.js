@@ -6,21 +6,33 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.WebSocketService = void 0;
+exports.webSocketService = void 0;
 var core_1 = require("@angular/core");
-var webSocket_1 = require("rxjs/webSocket");
-var WebSocketService = /** @class */ (function () {
-    function WebSocketService() {
-        this.socket$ = webSocket_1.webSocket('ws://localhost:3000'); // Replace with your WebSocket server URL
+var ngx_socket_io_1 = require("ngx-socket-io");
+var webSocketService = /** @class */ (function () {
+    function webSocketService() {
+        this.webSocket = new ngx_socket_io_1.Socket({
+            url: "http://localhost:3000",
+            options: {}
+        });
     }
-    WebSocketService.prototype.sendMessage = function (message) {
-        this.socket$.next({ event: 'sendChat', data: message });
+    // this method is used to start connection/handhshake of socket with server
+    webSocketService.prototype.connectSocket = function (message) {
+        this.webSocket.emit('connect', message);
     };
-    WebSocketService = __decorate([
+    // this method is used to get response from server
+    webSocketService.prototype.receiveStatus = function () {
+        return this.webSocket.fromEvent('/get-response');
+    };
+    // this method is used to end web socket connection
+    webSocketService.prototype.disconnectSocket = function () {
+        this.webSocket.disconnect();
+    };
+    webSocketService = __decorate([
         core_1.Injectable({
             providedIn: 'root'
         })
-    ], WebSocketService);
-    return WebSocketService;
+    ], webSocketService);
+    return webSocketService;
 }());
-exports.WebSocketService = WebSocketService;
+exports.webSocketService = webSocketService;

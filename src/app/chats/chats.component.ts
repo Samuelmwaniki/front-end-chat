@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { Router } from '@angular/router';
-
+import { webSocketService } from '../services/web-socket.service';
 
 interface User {
   _id: string;
@@ -11,7 +11,7 @@ interface User {
 interface Message {
   _id: number;
   sender: User;
-  recepient: User;
+  recipient: User;
   message: string;
   timestamp: Date;
 }
@@ -29,6 +29,7 @@ export class ChatsComponent implements OnInit {
   selectedUserId: string = '';
   selectedUser: User = {} as any;
  
+ 
   error:string=''
 
   constructor(private apiService: ApiService, private router: Router) { }
@@ -41,6 +42,7 @@ export class ChatsComponent implements OnInit {
         sender: this.currentUser._id,
         recipient: this.selectedUser._id,
         message: this.newMessage,
+        Date:Date
       };
       console.log('payload', payload);
       const res = await this.apiService.post('chats', payload);

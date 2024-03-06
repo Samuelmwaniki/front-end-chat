@@ -70,7 +70,8 @@ var ChatsComponent = /** @class */ (function () {
                         payload = {
                             sender: this.currentUser._id,
                             recipient: this.selectedUser._id,
-                            message: this.newMessage
+                            message: this.newMessage,
+                            Date: Date
                         };
                         console.log('payload', payload);
                         return [4 /*yield*/, this.apiService.post('chats', payload)];
