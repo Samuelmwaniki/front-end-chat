@@ -129,3 +129,15 @@
   font-style: italic;
   font-weight: 600;
 }
+
+.sent {
+  align-self: flex-end;
+  background-color: #DCF8C6;
+  /* Example background color for sent messages */
+}
+
+.received {
+  align-self: flex-start;
+  background-color: #EAEAEA;
+  /* Example background color for received messages */
+}
