@@ -8,19 +8,24 @@ import { ApiService } from 'src/app/services/api.service';
   styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent {
+onOtpChange($event: string) {
+throw new Error('Method not implemented.');
+}
   firstname: string = '';
   lastname: string = '';
   username: string = '';
   password: string = '';
+  resetEmail: string=''
   loading = true;
   error: string = '';
   errorMessage: any = [];
+  
 
 
   constructor(private apiService: ApiService, private router: Router) {}
 
   async register() {
-    console.log("WE ARE HERE")
+    // console.log("WE ARE HERE")
     this.loading = true;
     this.error = ''; // Clear any previous errors
 
@@ -30,10 +35,11 @@ export class RegisterComponent {
         lastname: this.lastname,
         username: this.username,
         password: this.password,
+     
         
       });
 
-      console.log("WE ARE HERE")
+      // console.log("WE ARE HERE")
       // Check if registration was successful
       if (res) {
         // Save user data to localStorage
@@ -42,6 +48,8 @@ export class RegisterComponent {
          lastname: this.lastname,
           username: this.username,
           password: this.password,
+           
+
         };
         localStorage.setItem('userData', JSON.stringify(userData));
 
@@ -64,4 +72,8 @@ export class RegisterComponent {
  goToLogin() {
     this.router.navigateByUrl('/login');
   }
-}
+
+  resetPassword() {
+
+  }
+  }

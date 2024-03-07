@@ -17,10 +17,11 @@
 </div>
    <div class="chat-messages">
   <div *ngFor="let message of messages; index as messageIndex" class="message-container"
-       [ngClass]="{ 'left': indexIsEven(messageIndex), 'right': !indexIsEven(messageIndex) }">
+       [ngClass]="{ 'left': message.sender === selectedUserId, 'right': message.sender === currentUser._id}">
     <div class="message">
       <div class="message-content">{{ message.message }}</div>
-      <div class="message-sender"> ~{{ currentUser.username }}
+      <div class="message-sender" *ngIf="message.sender === currentUser._id"> ~{{ currentUser.username }}
+      <div class="message-sender" *ngIf="message.sender === selectedUserId"> ~{{ selectedUser.username }}
 
       </div>
     </div>

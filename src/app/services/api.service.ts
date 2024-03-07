@@ -18,7 +18,14 @@ export class ApiService extends HttpService {
   sendMessage(chat: string) {
     //chat end points
     return this.post('/chat', { chat }); 
-  }}
+  }
+  resetPassword(reset:string){
+    return this.post('/reset', { reset });
+
+  }
+}
+
+
 
 //   getUsers(): Observable<any[]> {
 //     //hit the endpoint users

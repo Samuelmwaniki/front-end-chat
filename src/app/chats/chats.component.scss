@@ -122,12 +122,42 @@
     }
 }
 
-.sent {
-  align-self: flex-end;
-  background-color: #DCF8C6; /* Example background color for sent messages */
-}
+// .sent {
+//   align-self: flex-end;
+//   background-color: #DCF8C6; /* Example background color for sent messages */
+// }
 
-.received {
-  align-self: flex-start;
-  background-color: #EAEAEA; /* Example background color for received messages */
+// .received {
+//   align-self: flex-start;
+//   background-color: #EAEAEA; /* Example background color for received messages */
+// }
+
+
+// .chat-messages {
+//   display: flex; /* Allow horizontal layout */
+//   flex-direction: column-reverse; /* Reverse order for latest messages on top */
+//   overflow-y: scroll; /* Enable scrolling for long message lists */
+// }
+
+// // .message-container {
+// //   margin: 5px 0; /* Add spacing between messages */
+// // }
+
+// // .message {
+// //   padding: 10px;
+// //   border-radius: 5px;
+// //   background-color: #f5f5f5; /* Light background color */
+// // }
+
+// .is-sender {
+//   background-color: #e0e0e0; /* Lighter background for sender messages */
+//   text-align: right; /* Align sender messages to the right */
+// }
+
+// .message-sender {
+//   font-style: italic;
+//   margin-top: 5px;
+// }
+.is-sender {
+  text-align: right;
 }
