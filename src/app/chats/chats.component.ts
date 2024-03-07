@@ -10,8 +10,8 @@ interface User {
 
 interface Message {
   _id: number;
-  sender: User;
-  recipient: User;
+  sender: string;
+  recipient: string;
   message: string;
   timestamp: Date;
 }
@@ -42,7 +42,7 @@ export class ChatsComponent implements OnInit {
         sender: this.currentUser._id,
         recipient: this.selectedUser._id,
         message: this.newMessage,
-        Date:Date
+        createdAt: new Date(),
       };
       console.log('payload', payload);
       const res = await this.apiService.post('chats', payload);
@@ -156,6 +156,8 @@ export class ChatsComponent implements OnInit {
       return (index%2 === 0)
     } else {
       return false
-    }
+    }}
+    
   }
-}
+
+
