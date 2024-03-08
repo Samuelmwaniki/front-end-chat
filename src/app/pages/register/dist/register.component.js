@@ -52,17 +52,21 @@ var RegisterComponent = /** @class */ (function () {
         this.lastname = '';
         this.username = '';
         this.password = '';
+        this.resetEmail = '';
         this.loading = true;
         this.error = '';
         this.errorMessage = [];
     }
+    RegisterComponent.prototype.onOtpChange = function ($event) {
+        throw new Error('Method not implemented.');
+    };
     RegisterComponent.prototype.register = function () {
         return __awaiter(this, void 0, void 0, function () {
             var res, userData, response_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        console.log("WE ARE HERE");
+                        // console.log("WE ARE HERE")
                         this.loading = true;
                         this.error = ''; // Clear any previous errors
                         _a.label = 1;
@@ -76,7 +80,7 @@ var RegisterComponent = /** @class */ (function () {
                             })];
                     case 2:
                         res = _a.sent();
-                        console.log("WE ARE HERE");
+                        // console.log("WE ARE HERE")
                         // Check if registration was successful
                         if (res) {
                             userData = {
@@ -108,6 +112,8 @@ var RegisterComponent = /** @class */ (function () {
     };
     RegisterComponent.prototype.goToLogin = function () {
         this.router.navigateByUrl('/login');
+    };
+    RegisterComponent.prototype.resetPassword = function () {
     };
     RegisterComponent = __decorate([
         core_1.Component({

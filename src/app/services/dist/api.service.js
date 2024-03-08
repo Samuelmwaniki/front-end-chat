@@ -36,6 +36,9 @@ var ApiService = /** @class */ (function (_super) {
         //chat end points
         return this.post('/chat', { chat: chat });
     };
+    ApiService.prototype.resetPassword = function (reset) {
+        return this.post('/reset', { reset: reset });
+    };
     ApiService = __decorate([
         core_1.Injectable({
             providedIn: 'root'
