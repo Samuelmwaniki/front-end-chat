@@ -1,26 +1,42 @@
 <div class="chat-container">
+
   <header class="toolbar">
+
     <img src="https://images.squarespace-cdn.com/content/v1/58a1a2bb9f745664e6b41612/1597057412838-T3UTOLKZII99Q0OUGPK5/Sauti+Ya+Mtaa.jpg" alt="Tubonge Logo" class="logo">
+
     <button type="button" (click)="goToLogin()" class="register-btn">Logout</button>
   </header>
+
   <div class="chat-body">
-    <!-- Add dropdown menu for selecting users -->
+
+   <!-- selecting users as recipients  -->
+
    <div class="select-user">
+
   <label for="selectedUser" style="color:#007bff ;">users:</label>
+
   <select id="selectedUser" [(ngModel)]="selectedUserId" (change)="onSelectedUserChanged()">
+
     <option *ngFor="let user of users" [value]="user._id">{{ user.username }}</option>
   </select>
 </div>
 
 <div *ngIf="selectedUser._id" class="chat-message">
+
   <p>Chatting with: {{ selectedUser.username }}</p>
 </div>
    <div class="chat-messages">
+
   <div *ngFor="let message of messages; index as messageIndex" class="message-container"
+
        [ngClass]="{ 'left': message.sender === selectedUserId, 'right': message.sender === currentUser._id}">
+
     <div class="message">
-      <div class="message-content">{{ message.message }}</div>
+
+      <div class="message-content">{{ message.message }}
+
       <div class="message-sender" *ngIf="message.sender === currentUser._id"> ~{{ currentUser.username }}
+
       <div class="message-sender" *ngIf="message.sender === selectedUserId"> ~{{ selectedUser.username }}
 
       </div>
@@ -29,14 +45,17 @@
 </div>
   </div>
 
-  
-  
+  </div>
+  </div>
   
   <footer class="chat-footer">
+
     <div class="chat-input">
+      
       <textarea [(ngModel)]="newMessage" placeholder="Type your message..."></textarea>
       
-      <button type="button" (click)="sendMessage()" class="form"> sendMessage</button>
+      <button type="button" (click)="sendMessage()" class="form"> Send</button>
     </div>
+    
   </footer>
-</div>
+

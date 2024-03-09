@@ -11,13 +11,13 @@ import { RegisterComponent } from './pages/register/register.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ChatsComponent } from './chats/chats.component';
-import { webSocketService } from './services/web-socket.service'; // Import WebSocketService
 import { NgOtpInputModule } from 'ng-otp-input';
+import { WebSocketService } from './services/web-socket.service';
 
 @NgModule({
   declarations: [AppComponent, LoginComponent, RegisterComponent,ChatsComponent],
   imports: [CommonModule,NgOtpInputModule, FormsModule, ReactiveFormsModule, HttpClientModule, BrowserModule, IonicModule.forRoot(), AppRoutingModule], // Add IonicModule here
-  providers: [HttpService, ApiService,webSocketService],
+  providers: [HttpService, ApiService,WebSocketService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

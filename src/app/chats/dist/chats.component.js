@@ -45,9 +45,10 @@ exports.__esModule = true;
 exports.ChatsComponent = void 0;
 var core_1 = require("@angular/core");
 var ChatsComponent = /** @class */ (function () {
-    function ChatsComponent(apiService, router) {
+    function ChatsComponent(apiService, router, webSocketService) {
         this.apiService = apiService;
         this.router = router;
+        this.webSocketService = webSocketService;
         this.messages = [];
         this.newMessage = '';
         this.currentUser = {};
@@ -66,7 +67,7 @@ var ChatsComponent = /** @class */ (function () {
                         this.error = '';
                         _a.label = 1;
                     case 1:
-                        _a.trys.push([1, 5, , 6]);
+                        _a.trys.push([1, 3, , 4]);
                         payload = {
                             sender: this.currentUser._id,
                             recipient: this.selectedUser._id,
@@ -77,23 +78,21 @@ var ChatsComponent = /** @class */ (function () {
                         return [4 /*yield*/, this.apiService.post('chats', payload)];
                     case 2:
                         res = _a.sent();
-                        if (!res) return [3 /*break*/, 4];
-                        return [4 /*yield*/, this.fetchChats()];
-                    case 3: return [2 /*return*/, _a.sent()];
-                    case 4: return [3 /*break*/, 6];
-                    case 5:
+                        return [3 /*break*/, 4];
+                    case 3:
                         error_1 = _a.sent();
                         console.log('Error:', error_1);
                         if (error_1.response && error_1.response.status === 400) {
                             console.log('STATUS CODE : ', error_1.response.status);
                             // handle 400 status code error
                         }
-                        return [3 /*break*/, 6];
-                    case 6: return [2 /*return*/];
+                        return [3 /*break*/, 4];
+                    case 4: return [2 /*return*/];
                 }
             });
         });
     };
+    // fetch chats from the database 
     ChatsComponent.prototype.fetchChats = function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
@@ -169,20 +168,52 @@ var ChatsComponent = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        if (!this.selectedUserId) return [3 /*break*/, 2];
+                        if (!this.selectedUserId) return [3 /*break*/, 3];
                         this.selectedUser = this.users.find(function (user) { return user._id === _this.selectedUserId; });
                         console.log('USER CHANGED');
-                        return [4 /*yield*/, this.fetchChats()];
+                        return [4 /*yield*/, this.createSocketConnection()];
                     case 1:
                         _a.sent();
+                        return [4 /*yield*/, this.fetchChats()];
+                    case 2:
+                        _a.sent();
+                        return [3 /*break*/, 4];
+                    case 3:
+                        this.selectedUser = {};
+                        _a.label = 4;
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    ChatsComponent.prototype.createSocketConnection = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var socket, error_2;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.webSocketService.connect()];
+                    case 1:
+                        socket = _a.sent();
+                        socket.on('message', function (message) {
+                            _this.handleSocketMessage(message);
+                        });
                         return [3 /*break*/, 3];
                     case 2:
-                        this.selectedUser = {};
-                        _a.label = 3;
+                        error_2 = _a.sent();
+                        console.error("error establishing websocket");
+                        return [3 /*break*/, 3];
                     case 3: return [2 /*return*/];
                 }
             });
         });
+    };
+    ChatsComponent.prototype.handleSocketMessage = function (message) {
+        if (message && ((message.recipient === this.currentUser._id && message.sender === this.selectedUser._id) || (message.recipient === this.selectedUser._id && message.sender === this.currentUser._id))) {
+            this.messages.push(message);
+        }
     };
     ChatsComponent.prototype.goToLogin = function () {
         this.router.navigateByUrl('/login');
