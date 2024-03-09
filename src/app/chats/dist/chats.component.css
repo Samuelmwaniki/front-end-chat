@@ -24,7 +24,7 @@
 }
 
 .logo {
-  max-width: 100px;
+  max-width: 120px;
   /* Set a maximum width for your logo image */
   height: auto;
   /* Maintain aspect ratio */
@@ -128,8 +128,4 @@
   font-size: 11px;
   font-style: italic;
   font-weight: 600;
-}
-
-.is-sender {
-  text-align: right;
 }

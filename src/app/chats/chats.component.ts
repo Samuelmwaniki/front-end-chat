@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { Router } from '@angular/router';
-import { webSocketService } from '../services/web-socket.service';
+import { WebSocketService } from '../services/web-socket.service';
 
 interface User {
   _id: string;
@@ -9,6 +9,7 @@ interface User {
 }
 
 interface Message {
+  
   _id: number;
   sender: string;
   recipient: string;
@@ -21,6 +22,7 @@ interface Message {
   templateUrl: './chats.component.html',
   styleUrls: ['./chats.component.scss']
 })
+
 export class ChatsComponent implements OnInit {
   messages: Message[] = [];
   newMessage: string = '';
@@ -32,37 +34,35 @@ export class ChatsComponent implements OnInit {
  
   error:string=''
 
-  constructor(private apiService: ApiService, private router: Router) { }
+  constructor(
+    private apiService: ApiService, 
+    private router: Router, 
+    private webSocketService: WebSocketService 
+  ) { }
   async sendMessage() {
     console.log("message send");
 
     this.error = '';
+
     try {
+
       const payload = {
+
         sender: this.currentUser._id,
         recipient: this.selectedUser._id,
         message: this.newMessage,
         createdAt: new Date(),
+
       };
+
       console.log('payload', payload);
+
       const res = await this.apiService.post('chats', payload);
 
-      if (res) {
-        return await this.fetchChats();
+      // if (res) {
+      //   return await this.fetchChats();
 
-        // const chat =
-        //  {
-        //   _id: this.selectedUserId,
-        //   sender: this.currentUser,
-        //   recipient: this.selectedUser,
-        //   message: this.newMessage
-        //  };
-
-        
-
-        //   localStorage.setItem('chat', JSON.stringify(chat));
-        //  }
-      }
+      // }
 
     } 
     catch (error:any) {
@@ -72,12 +72,19 @@ export class ChatsComponent implements OnInit {
       if (error.response && error.response.status === 400) {
         
         console.log('STATUS CODE : ', error.response.status);
+
         // handle 400 status code error
+        
       }
+
     }
+
   }
 
+  // fetch chats from the database 
+
   async fetchChats() {
+
     await this.apiService.get('chats/?recipientId='+this.selectedUser._id+'&senderId='+this.currentUser._id)
       .then( ({ data } : any) => {
         this.messages = data;
@@ -141,9 +148,29 @@ export class ChatsComponent implements OnInit {
       this.selectedUser = this.users.find((user: User) => user._id === this.selectedUserId) as any;
 
       console.log('USER CHANGED')
+      await this.createSocketConnection();
       await this.fetchChats();
     } else {
       this.selectedUser = {} as any;
+    }
+  }
+
+  async createSocketConnection()
+  {
+    try {
+      const socket = await this.webSocketService.connect();
+      
+      socket.on('message', (message: any) => {
+          this.handleSocketMessage(message)
+      });
+    }catch (error) {
+      console.error("error establishing websocket")
+    }
+  }
+  
+  handleSocketMessage(message: any) {
+    if(message &&(( message.recipient === this.currentUser._id && message.sender === this.selectedUser._id) || ( message.recipient === this.selectedUser._id && message.sender === this.currentUser._id))) {
+      this.messages.push(message)
     }
   }
 

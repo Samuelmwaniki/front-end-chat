@@ -1,29 +1,18 @@
-import { Injectable } from '@angular/core';
-import { Socket } from 'ngx-socket-io';
-@Injectable({
- providedIn: 'root',
-})
-export class webSocketService {
- private webSocket: Socket;
- constructor() {
-  this.webSocket = new Socket({
-   url: "http://localhost:3000",
-   options: {},
-  });
- }
+import io from 'socket.io-client';
 
- // this method is used to start connection/handhshake of socket with server
- connectSocket(message: any) {
-  this.webSocket.emit('connect', message);
- }
 
- // this method is used to get response from server
- receiveStatus() {
-  return this.webSocket.fromEvent('/get-response');
- }
+export class WebSocketService {
 
- // this method is used to end web socket connection
- disconnectSocket() {
-  this.webSocket.disconnect();
- }
+    private socket: any;
+
+    constructor() {} 
+
+    async connect()
+    {
+        this.socket = io('http://localhost:3030/active_chats');  
+        this.socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+        return this.socket;
+    }
 }
