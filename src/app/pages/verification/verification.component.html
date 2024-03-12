@@ -1,3 +1,8 @@
-<p>
-  verification works!
-</p>
+<div class="verification-dialogue">
+  <div class="verification-container">
+    <h2>Verification</h2>
+    <input type="text" [(ngModel)]="verificationCode" placeholder="Enter verification code" class="verification-input">
+    <button (click)="verifyUser()" class="verification-button">Verify</button>
+    <div *ngIf="verificationError" class="error">{{ verificationError }}</div>
+  </div>
+</div>

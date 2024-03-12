@@ -13,9 +13,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ChatsComponent } from './chats/chats.component';
 import { NgOtpInputModule } from 'ng-otp-input';
 import { WebSocketService } from './services/web-socket.service';
+import { VerificationComponent } from './pages/verification/verification.component';
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent, RegisterComponent,ChatsComponent],
+  declarations: [AppComponent, LoginComponent, RegisterComponent,ChatsComponent,VerificationComponent],
   imports: [CommonModule,NgOtpInputModule, FormsModule, ReactiveFormsModule, HttpClientModule, BrowserModule, IonicModule.forRoot(), AppRoutingModule], // Add IonicModule here
   providers: [HttpService, ApiService,WebSocketService],
   bootstrap: [AppComponent],
