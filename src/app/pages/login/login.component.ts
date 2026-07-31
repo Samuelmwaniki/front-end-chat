@@ -13,6 +13,11 @@ export class LoginComponent {
   loading = false;
   error: string = '';
 
+  // new — needed by the updated template
+  mode: 'signin' | 'signup' = 'signin';
+  showPassword = false;
+  rememberMe = false;
+
   constructor(private apiService: ApiService, private router: Router) {}
 
   async login() {
@@ -20,8 +25,8 @@ export class LoginComponent {
     this.error = ''; // Clear any previous errors
 
     try {
-      const res:any = await this.apiService.post('users/login', { username: this.username, password: this.password });
-        console.log('res: ', res)
+      const res: any = await this.apiService.post('users/login', { username: this.username, password: this.password });
+      console.log('res: ', res)
 
       if (res) {
 
@@ -40,5 +45,17 @@ export class LoginComponent {
 
   goToRegister() {
     this.router.navigateByUrl('/register');
+  }
+
+  loginWithGoogle() {
+    // TODO: wire up your Google auth flow
+  }
+
+  loginWithFacebook() {
+    // TODO: wire up your Facebook auth flow
+  }
+
+  loginWithApple() {
+    // TODO: wire up your Apple auth flow
   }
 }

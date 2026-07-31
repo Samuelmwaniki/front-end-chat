@@ -1,31 +1,123 @@
-<div class="container">
- 
-  <form (ngSubmit)="login()" class="form" validate>
-<img src="https://images.squarespace-cdn.com/content/v1/58a1a2bb9f745664e6b41612/1597057412838-T3UTOLKZII99Q0OUGPK5/Sauti+Ya+Mtaa.jpg" alt="Tubonge Logo" class="logo">
-    <!-- <h2 class="form-title">Tubonge Login</h2> -->
-    <br><br>
-    <div class="form-group">
-      <label for="username">Username:</label>
-      <input type="text" id="username" name="username" [(ngModel)]="username" required
-             [ngClass]="{ 'is-invalid': !username }">
-      <div *ngIf="!username" class="error-message">Username is required.</div>
+<div class="auth-page">
+  <div class="auth-card">
+
+    <!-- Logo -->
+    <div class="logo-wrap">
+      <img src="https://images.squarespace-cdn.com/content/v1/58a1a2bb9f745664e6b41612/1597057412838-T3UTOLKZII99Q0OUGPK5/Sauti+Ya+Mtaa.jpg"
+           alt="Tubonge Logo" class="logo">
     </div>
-    <div class="form-group">
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" [(ngModel)]="password" required minlength="5"
-             [ngClass]="{ 'is-invalid': password && password.length < 5 }">
-      <div *ngIf="password && password.length < 5" class="error-message">Password must be at least 5 characters.</div>
-       <div *ngIf="error" class="error-message">{{ error }}</div>
+
+    <h1 class="title">Welcome Back!</h1>
+    <p class="subtitle">Log in to continue to Tubonge</p>
+
+    <!-- Sign In / Sign Up tabs -->
+    <div class="tabs">
+      <button type="button"
+              class="tab"
+              [class.active]="mode === 'signin'"
+              (click)="mode = 'signin'">
+        Sign In
+      </button>
+      <button type="button"
+              class="tab"
+              [class.active]="mode === 'signup'"
+              (click)="goToRegister()">
+        Sign Up
+      </button>
     </div>
-    <div class="form-actions">
+
+    <form (ngSubmit)="login()" class="form" novalidate>
+
+      <!-- Username -->
+      <div class="form-group">
+        <label for="username">Username</label>
+        <div class="input-wrap" [class.is-invalid]="!username">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <input type="text" id="username" name="username" [(ngModel)]="username"
+                 placeholder="Enter your username" required autocomplete="username">
+        </div>
+        <div *ngIf="!username" class="error-message">Username is required.</div>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrap" [class.is-invalid]="password && password.length < 5">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.6"/>
+          </svg>
+          <input [type]="showPassword ? 'text' : 'password'" id="password" name="password"
+                 [(ngModel)]="password" placeholder="Enter your password" required minlength="5"
+                 autocomplete="current-password">
+          <button type="button" class="toggle-visibility" (click)="showPassword = !showPassword"
+                  [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+            <svg *ngIf="!showPassword" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" stroke="currentColor" stroke-width="1.6"/>
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+            <svg *ngIf="showPassword" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.2 4.2M6.5 6.7C3.9 8.3 2 12 2 12s4 7 11 7c2 0 3.7-.6 5.1-1.4M9.9 4.2C10.6 4.1 11.3 4 12 4c7 0 11 7 11 7-.5.9-1.6 2.5-3.2 4"
+                    stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div *ngIf="password && password.length < 5" class="error-message">Password must be at least 5 characters.</div>
+        <div *ngIf="error" class="error-message">{{ error }}</div>
+      </div>
+
+      <!-- Remember me / Forgot password -->
+      <div class="row-between">
+        <label class="checkbox-label">
+          <input type="checkbox" name="rememberMe" [(ngModel)]="rememberMe">
+          <span>Remember me</span>
+        </label>
+        <a href="javascript:void(0)" class="forgot-link">Forgot Password?</a>
+      </div>
+
+      <!-- Submit -->
       <button type="submit" [disabled]="loading" class="submit-btn">
         <span *ngIf="loading"><ion-spinner></ion-spinner></span>
-        <span *ngIf="!loading">Login</span>
+        <span *ngIf="!loading">Sign In</span>
       </button>
-      <button type="button" (click)="goToRegister()" class="register-btn">Register</button>
-       
-    </div>
-    <br><br> <p style="color:green;">forgot password?</p>
-    
-  </form>
 
+      <!-- Divider -->
+      <div class="divider">
+        <span></span>
+        <p>or sign in with</p>
+        <span></span>
+      </div>
+
+      <!-- Social buttons -->
+      <div class="social-row">
+        <button type="button" class="social-btn" (click)="loginWithGoogle()">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path fill="#4285F4" d="M23.52 12.27c0-.85-.07-1.47-.23-2.12H12v3.85h6.6c-.13 1.06-.85 2.66-2.45 3.73l-.02.15 3.56 2.7.25.02c2.27-2.05 3.58-5.07 3.58-8.33Z"/>
+            <path fill="#34A853" d="M12 23.5c3.24 0 5.96-1.05 7.94-2.86l-3.79-2.87c-1.01.7-2.38 1.19-4.15 1.19-3.17 0-5.86-2.05-6.82-4.9l-.14.01-3.7 2.8-.05.13C3.25 20.9 7.28 23.5 12 23.5Z"/>
+            <path fill="#FBBC05" d="M5.18 14.06a6.9 6.9 0 0 1-.38-2.31c0-.8.14-1.58.37-2.31l-.01-.15-3.75-2.83-.12.06A11.5 11.5 0 0 0 .3 11.75c0 1.86.45 3.62 1.24 5.18l3.64-2.87Z"/>
+            <path fill="#EA4335" d="M12 4.75c2.26 0 3.78.95 4.65 1.75l3.4-3.24C17.95 1.44 15.24.5 12 .5 7.28.5 3.25 3.1 1.24 6.94l3.93 3.05c.97-2.85 3.66-4.9 6.83-4.9Z"/>
+          </svg>
+          <span>Google</span>
+        </button>
+
+        <button type="button" class="social-btn" (click)="loginWithFacebook()">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path fill="#1877F2" d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.7 4.53-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07Z"/>
+          </svg>
+          <span>Facebook</span>
+        </button>
+
+        <button type="button" class="social-btn" (click)="loginWithApple()">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path fill="#000" d="M16.36 1.6c0 1.07-.4 2.06-1.14 2.83-.83.86-2.06 1.53-3.13 1.44-.13-1.02.38-2.08 1.13-2.86.83-.85 2.23-1.5 3.14-1.41ZM19.9 17.53c-.55 1.28-.81 1.85-1.53 2.98-1 1.6-2.42 3.59-4.17 3.6-1.55.02-1.95-1.01-4.06-1-2.1.01-2.54 1.02-4.09 1-1.75-.02-3.1-1.82-4.1-3.42-2.8-4.44-3.1-9.66-1.37-12.44 1.23-1.98 3.16-3.14 4.98-3.14 1.85 0 3.02 1.02 4.55 1.02 1.48 0 2.4-1.02 4.55-1.02 1.62 0 3.34.88 4.56 2.4-4.01 2.2-3.36 7.93.68 10.02Z"/>
+          </svg>
+          <span>Apple</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

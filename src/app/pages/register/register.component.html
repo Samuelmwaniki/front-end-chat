@@ -1,41 +1,106 @@
-<div class="container">
-  <form (ngSubmit)="register()" #registerForm="ngForm" class="form">
-    <h2 class="form-title">Register</h2>
-    <div class="form-group">
-      <label for="firstname">First Name:</label>
-      <input type="text" id="firstname" name="firstname" [(ngModel)]="firstname" required minlength="4"
-             [ngClass]="{ 'is-invalid': firstname && firstname.length < 5 }">
-      <div *ngIf="firstname && firstname.length < 5" class="error-message">First name must be at least 5 characters.</div>
-      <div [ngClass]="{ 'is-invalid': !firstname }"></div>
-      <div *ngIf="!firstname" class="error-message">First name is required.</div>
+<div class="auth-page">
+  <div class="auth-card">
+
+    <!-- Logo -->
+    <div class="logo-wrap">
+      <img src="https://images.squarespace-cdn.com/content/v1/58a1a2bb9f745664e6b41612/1597057412838-T3UTOLKZII99Q0OUGPK5/Sauti+Ya+Mtaa.jpg"
+           alt="Tubonge Logo" class="logo">
     </div>
-    <div class="form-group">
-      <label for="lastname">Last Name:</label>
-      <input type="text" id="lastname" name="lastname" [(ngModel)]="lastname" required minlength="4" maxlength="50"
-             [ngClass]="{ 'is-invalid': lastname && lastname.length < 5 }">
-      <div *ngIf="lastname && lastname.length < 5" class="error-message">Last name must be at least 5 characters.</div>
-      <div [ngClass]="{ 'is-invalid': !lastname }"></div>
-      <div *ngIf="!lastname" class="error-message">Last name is required.</div>
-    </div>
-    <div class="form-group">
-      <label for="username">Username:</label>
-      <input type="text" id="username" name="username" [(ngModel)]="username" required minlength="4"
-             [ngClass]="{ 'is-invalid': username && username.length < 5 }">
-      <div *ngIf="username && username.length < 5" class="error-message">Username must be at least 5 characters.</div>
-      <div [ngClass]="{ 'is-invalid': !username }"></div>
-      <div *ngIf="!username" class="error-message">Username is required.</div>
-    </div>
-    <div class="form-group">
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" [(ngModel)]="password" required minlength="5"
-             [ngClass]="{ 'is-invalid': password && password.length < 5 }">
-      <div *ngIf="password && password.length < 5" class="error-message">Password must be at least 5 characters.</div>
-      <div *ngIf="error" class="error-message">{{ error }}</div>
-    </div>
-    <button type="submit" [disabled]="!registerForm.valid">Register</button>
-    <p style="color:green;">You have an existing account?</p>
-    <hr>
-    <button type="button" (click)="goToLogin()" class="register-btn">Login</button>
-  </form>
-  <div *ngIf="errorMessage">{{errorMessage}}</div>
+
+    <h1 class="title">Create Account</h1>
+    <p class="subtitle">Join Tubonge and get started</p>
+
+    <form (ngSubmit)="register()" #registerForm="ngForm" class="form" novalidate>
+
+      <!-- First Name -->
+      <div class="form-group">
+        <label for="firstname">First Name</label>
+        <div class="input-wrap" [class.is-invalid]="firstname && firstname.length < 5 || (!firstname && firstname !== undefined)">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <input type="text" id="firstname" name="firstname" [(ngModel)]="firstname" required minlength="4"
+                 placeholder="Enter your first name" autocomplete="given-name">
+        </div>
+        <div *ngIf="firstname && firstname.length < 5" class="error-message">First name must be at least 5 characters.</div>
+        <div *ngIf="!firstname" class="error-message">First name is required.</div>
+      </div>
+
+      <!-- Last Name -->
+      <div class="form-group">
+        <label for="lastname">Last Name</label>
+        <div class="input-wrap" [class.is-invalid]="lastname && lastname.length < 5 || (!lastname && lastname !== undefined)">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <input type="text" id="lastname" name="lastname" [(ngModel)]="lastname" required minlength="4" maxlength="50"
+                 placeholder="Enter your last name" autocomplete="family-name">
+        </div>
+        <div *ngIf="lastname && lastname.length < 5" class="error-message">Last name must be at least 5 characters.</div>
+        <div *ngIf="!lastname" class="error-message">Last name is required.</div>
+      </div>
+
+      <!-- Username -->
+      <div class="form-group">
+        <label for="username">Username</label>
+        <div class="input-wrap" [class.is-invalid]="username && username.length < 5 || (!username && username !== undefined)">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <input type="text" id="username" name="username" [(ngModel)]="username" required minlength="4"
+                 placeholder="Choose a username" autocomplete="username">
+        </div>
+        <div *ngIf="username && username.length < 5" class="error-message">Username must be at least 5 characters.</div>
+        <div *ngIf="!username" class="error-message">Username is required.</div>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrap" [class.is-invalid]="password && password.length < 5 || (!password && password !== undefined)">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.6"/>
+          </svg>
+          <input [type]="showPassword ? 'text' : 'password'" id="password" name="password"
+                 [(ngModel)]="password" required minlength="5"
+                 placeholder="Create a password" autocomplete="new-password">
+          <button type="button" class="toggle-visibility" (click)="showPassword = !showPassword"
+                  [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+            <svg *ngIf="!showPassword" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" stroke="currentColor" stroke-width="1.6"/>
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+            <svg *ngIf="showPassword" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.2 4.2M6.5 6.7C3.9 8.3 2 12 2 12s4 7 11 7c2 0 3.7-.6 5.1-1.4M9.9 4.2C10.6 4.1 11.3 4 12 4c7 0 11 7 11 7-.5.9-1.6 2.5-3.2 4"
+                    stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div *ngIf="password && password.length < 5" class="error-message">Password must be at least 5 characters.</div>
+        <div *ngIf="error" class="error-message">{{ error }}</div>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" [disabled]="!registerForm.valid || loading" class="submit-btn">
+        <span *ngIf="loading"><ion-spinner></ion-spinner></span>
+        <span *ngIf="!loading">Register</span>
+      </button>
+
+      <!-- Divider -->
+      <div class="divider">
+        <span></span>
+        <p>or</p>
+        <span></span>
+      </div>
+
+      <a href="javascript:void(0)" class="existing-account-link" (click)="goToLogin()">You have an existing account?</a>
+
+      <button type="button" (click)="goToLogin()" class="login-btn">Login</button>
+
+    </form>
+  </div>
 </div>
