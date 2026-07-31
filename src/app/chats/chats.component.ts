@@ -14,7 +14,9 @@ interface Message {
   sender: string;
   recipient: string;
   message: string;
-  timestamp: Date;
+  createdAt?: Date;
+  timestamp?: Date;
+  read?: boolean;
 }
 
 // NEW: shape returned by GET /chats/conversations
@@ -47,6 +49,10 @@ export class ChatsComponent implements OnInit, OnDestroy {
 
   // NEW: last-message previews + unread counts, keyed by the other user's id.
   conversations: Map<string, ConversationPreview> = new Map();
+
+  // NEW: typing indicator state
+  isRecipientTyping = false;
+  private typingTimeout: any = null;
 
   error:string=''
 
@@ -86,7 +92,34 @@ export class ChatsComponent implements OnInit, OnDestroy {
 
   async selectUser(user: User) {
     this.selectedUserId = user._id;
+    this.isRecipientTyping = false;
     await this.onSelectedUserChanged();
+  }
+
+  // NEW: called on every keystroke in the message textarea. Emits
+  // 'typing: true' once, then resets a timer that emits 'typing: false'
+  // after 2s of no further keystrokes — so we're not spamming an event
+  // per character.
+  onMessageInput() {
+    if (!this.selectedUser._id) {
+      return;
+    }
+    if (!this.typingTimeout) {
+      this.webSocketService.emit('typing', {
+        senderId: this.currentUser._id,
+        recipientId: this.selectedUser._id,
+        isTyping: true,
+      });
+    }
+    clearTimeout(this.typingTimeout);
+    this.typingTimeout = setTimeout(() => {
+      this.webSocketService.emit('typing', {
+        senderId: this.currentUser._id,
+        recipientId: this.selectedUser._id,
+        isTyping: false,
+      });
+      this.typingTimeout = null;
+    }, 2000);
   }
 
   async sendMessage() {
@@ -97,6 +130,17 @@ export class ChatsComponent implements OnInit, OnDestroy {
     }
 
     this.error = '';
+
+    // Stop signaling "typing" the moment we actually send.
+    if (this.typingTimeout) {
+      clearTimeout(this.typingTimeout);
+      this.typingTimeout = null;
+      this.webSocketService.emit('typing', {
+        senderId: this.currentUser._id,
+        recipientId: this.selectedUser._id,
+        isTyping: false,
+      });
+    }
 
     try {
 
@@ -195,6 +239,8 @@ export class ChatsComponent implements OnInit, OnDestroy {
       socket.off('message');
       socket.off('userStatus');
       socket.off('onlineUsers');
+      socket.off('typing');
+      socket.off('messagesRead');
     } catch (error) {
       // socket already gone, nothing to clean up
     }
@@ -232,6 +278,8 @@ export class ChatsComponent implements OnInit, OnDestroy {
       socket.off('userStatus');
       socket.off('onlineUsers');
 
+      socket.off('typing');
+      socket.off('messagesRead');
       socket.on('message', (message: any) => {
           this.handleSocketMessage(message)
       });
@@ -247,6 +295,25 @@ export class ChatsComponent implements OnInit, OnDestroy {
 
       socket.on('onlineUsers', (userIds: string[]) => {
         this.onlineUserIds = new Set(userIds);
+      });
+
+      // NEW: typing indicator — only relevant if it's from whoever we
+      // currently have open.
+      socket.on('typing', (payload: { senderId: string; isTyping: boolean }) => {
+        if (payload.senderId === this.selectedUser._id) {
+          this.isRecipientTyping = payload.isTyping;
+        }
+      });
+
+      // NEW: read receipts — the other side just read our messages to
+      // them. If that's the conversation we currently have open, flip
+      // our sent messages to read=true so "Seen" shows up.
+      socket.on('messagesRead', (payload: { readerId: string }) => {
+        if (payload.readerId === this.selectedUser._id) {
+          this.messages = this.messages.map(m =>
+            m.sender === this.currentUser._id ? { ...m, read: true } : m
+          );
+        }
       });
 
       // NEW: tell the gateway who we are, now that the socket is open.

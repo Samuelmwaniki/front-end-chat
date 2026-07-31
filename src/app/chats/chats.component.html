@@ -58,12 +58,24 @@
       </div>
 
       <div class="messages" *ngIf="selectedUser._id; else emptyState">
-        <div *ngFor="let message of messages"
+        <div *ngFor="let message of messages; index as i"
              class="message-row"
              [ngClass]="{ 'from-them': message.sender === selectedUserId, 'from-me': message.sender === currentUser._id }">
           <div class="bubble">
             <p class="bubble-text">{{ message.message }}</p>
+            <span class="bubble-time">{{ (message.createdAt || message.timestamp) | date:'shortTime' }}</span>
           </div>
+        </div>
+
+        <!-- Read receipt: shown only under the very last message, and only if it's ours and has been read -->
+        <div class="seen-label"
+             *ngIf="messages.length && messages[messages.length - 1].sender === currentUser._id && messages[messages.length - 1].read">
+          Seen
+        </div>
+
+        <!-- Typing indicator -->
+        <div class="typing-indicator" *ngIf="isRecipientTyping">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
         </div>
       </div>
 
@@ -86,6 +98,7 @@
 
       <footer class="chat-footer" *ngIf="selectedUser._id">
         <textarea [(ngModel)]="newMessage" placeholder="Type your message..." rows="1"
+                  (input)="onMessageInput()"
                   (keydown.enter)="$event.preventDefault(); sendMessage()"></textarea>
         <button type="button" (click)="sendMessage()" class="send-btn" [disabled]="!newMessage.trim()">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">

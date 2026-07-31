@@ -27,4 +27,10 @@ export class WebSocketService {
     identify(userId: string) {
         this.socket?.emit('identify', userId);
     }
+
+    // NEW: generic emit, used for things like the typing indicator
+    // where the payload shape varies per event.
+    emit(event: string, payload: any) {
+        this.socket?.emit(event, payload);
+    }
 }
