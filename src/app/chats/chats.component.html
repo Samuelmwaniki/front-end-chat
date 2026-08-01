@@ -15,20 +15,29 @@
 
   <div class="chat-body">
 
-    <!-- Sidebar: user list -->
+    <!-- Sidebar: friends list -->
     <aside class="user-panel">
-      <h2 class="user-panel-title">Users</h2>
+      <div class="user-panel-header">
+        <h2 class="user-panel-title">Friends</h2>
+        <button type="button" class="add-friend-btn" (click)="openFriendsHub()">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM19 8v6M22 11h-6"
+                  stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Add Friend</span>
+        </button>
+      </div>
 
       <div class="search-wrap">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/>
           <path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
-        <input type="text" [(ngModel)]="userSearchTerm" placeholder="Search users...">
+        <input type="text" [(ngModel)]="userSearchTerm" placeholder="Search friends...">
       </div>
 
       <ul class="user-list">
-        <li *ngFor="let user of filteredUsers"
+        <li *ngFor="let user of filteredFriends"
             class="user-item"
             [class.active]="user._id === selectedUserId"
             (click)="selectUser(user)">
@@ -41,7 +50,9 @@
           </div>
           <p class="user-last-message" *ngIf="getLastMessage(user._id)">{{ getLastMessage(user._id) }}</p>
         </li>
-        <li *ngIf="filteredUsers.length === 0" class="user-list-empty">No users found</li>
+        <li *ngIf="filteredFriends.length === 0" class="user-list-empty">
+          No friends yet — add one to start chatting.
+        </li>
       </ul>
     </aside>
 
@@ -55,6 +66,12 @@
             {{ isOnline(selectedUser._id) ? 'Online' : 'Offline' }}
           </span>
         </div>
+        <button type="button" class="unfriend-btn" (click)="unfriendUser()">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span>Unfriend</span>
+        </button>
       </div>
 
       <div class="messages" *ngIf="selectedUser._id; else emptyState">
@@ -80,19 +97,105 @@
       </div>
 
       <ng-template #emptyState>
-        <div class="empty-state">
-          <svg viewBox="0 0 120 90" width="90" height="70" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="4" y="8" width="62" height="42" rx="14" fill="#e8e8e8"/>
-            <circle cx="24" cy="29" r="3" fill="#9a9a9a"/>
-            <circle cx="35" cy="29" r="3" fill="#9a9a9a"/>
-            <circle cx="46" cy="29" r="3" fill="#9a9a9a"/>
-            <rect x="46" y="38" width="70" height="46" rx="16" fill="#d6ec4f"/>
-            <circle cx="70" cy="61" r="3" fill="#4a5a1f"/>
-            <circle cx="81" cy="61" r="3" fill="#4a5a1f"/>
-            <circle cx="92" cy="61" r="3" fill="#4a5a1f"/>
-          </svg>
-          <h3>Start your conversation</h3>
-          <p>Send a message to start chatting</p>
+        <div class="friends-hub">
+
+          <!-- Add Friend -->
+          <div class="hub-card">
+            <div class="hub-card-header">
+              <div class="hub-icon">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM19 8v6M22 11h-6"
+                        stroke="#1b8a3e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div>
+                <h3>Add Friend</h3>
+                <p>Send a friend request by username</p>
+              </div>
+            </div>
+
+            <form class="invite-form" (ngSubmit)="inviteFriend()">
+              <input type="text" [(ngModel)]="inviteUsername" name="inviteUsername" placeholder="Enter username">
+              <button type="submit" [disabled]="inviteLoading || !inviteUsername.trim()">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Invite</span>
+              </button>
+            </form>
+            <p class="invite-error" *ngIf="inviteError">{{ inviteError }}</p>
+            <p class="invite-success" *ngIf="inviteSuccess">{{ inviteSuccess }}</p>
+          </div>
+
+          <!-- Pending Requests -->
+          <div class="hub-card" *ngIf="pendingRequests.length > 0">
+            <div class="hub-card-header">
+              <h3>Pending Requests <span class="count-pill">{{ pendingRequests.length }}</span></h3>
+            </div>
+            <p class="hub-subtext">People who sent you a friend request</p>
+
+            <div class="request-row" *ngFor="let request of (showAllRequests ? pendingRequests : pendingRequests.slice(0, 2))">
+              <div class="request-info">
+                <span class="request-name">{{ request.fromUsername }}</span>
+                <span class="request-username">&#64;{{ request.fromUsername }}</span>
+              </div>
+              <div class="request-actions">
+                <button type="button" class="decline-btn" (click)="respondToRequest(request, false)">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                  <span>Decline</span>
+                </button>
+                <button type="button" class="accept-btn" (click)="respondToRequest(request, true)">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>Accept</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="view-all-link" *ngIf="pendingRequests.length > 2" (click)="showAllRequests = !showAllRequests">
+              {{ showAllRequests ? 'Show less' : 'View all requests' }}
+            </button>
+          </div>
+
+          <!-- Manage Invites (sent requests) -->
+          <div class="hub-card">
+            <button type="button" class="manage-invites-toggle" (click)="showManageInvites = !showManageInvites">
+              <div class="hub-icon hub-icon-soft">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7Z" stroke="#1b8a3e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="manage-invites-text">
+                <h3>Manage Invites</h3>
+                <p>View your sent requests</p>
+              </div>
+              <svg class="chevron" [class.open]="showManageInvites" viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+
+            <div class="sent-requests" *ngIf="showManageInvites">
+              <div class="request-row" *ngFor="let request of sentRequests">
+                <div class="request-info">
+                  <span class="request-name">{{ request.toUsername }}</span>
+                  <span class="request-status">Pending</span>
+                </div>
+                <button type="button" class="decline-btn" (click)="cancelSentRequest(request)">
+                  <span>Cancel</span>
+                </button>
+              </div>
+              <p class="hub-subtext" *ngIf="sentRequests.length === 0">No pending sent invites.</p>
+            </div>
+          </div>
+
+          <div class="hub-empty-illustration" *ngIf="friends.length === 0 && pendingRequests.length === 0">
+            <h3>Select a friend to start chatting</h3>
+            <p>Add a friend above to start a conversation</p>
+          </div>
+
         </div>
       </ng-template>
 

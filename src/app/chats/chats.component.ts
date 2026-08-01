@@ -28,6 +28,21 @@ interface ConversationPreview {
   unreadCount: number;
 }
 
+// NEW: shapes returned by the friends endpoints
+interface PendingRequest {
+  requestId: string;
+  fromUserId: string;
+  fromUsername: string;
+  createdAt: string | Date;
+}
+
+interface SentRequest {
+  requestId: string;
+  toUserId: string;
+  toUsername: string;
+  createdAt: string | Date;
+}
+
 @Component({
   selector: 'app-chats',
   templateUrl: './chats.component.html',
@@ -38,11 +53,21 @@ export class ChatsComponent implements OnInit, OnDestroy {
   messages: Message[] = [];
   newMessage: string = '';
   currentUser: User = {} as any;
-  users: User[] = [];
+  friends: User[] = [];
   selectedUserId: string = '';
   selectedUser: User = {} as any;
 
   userSearchTerm: string = '';
+
+  // NEW: friend request state
+  pendingRequests: PendingRequest[] = [];
+  sentRequests: SentRequest[] = [];
+  inviteUsername: string = '';
+  inviteError: string = '';
+  inviteSuccess: string = '';
+  inviteLoading = false;
+  showAllRequests = false;
+  showManageInvites = false;
 
   // NEW: online presence — set of userIds currently connected.
   onlineUserIds: Set<string> = new Set();
@@ -62,14 +87,13 @@ export class ChatsComponent implements OnInit, OnDestroy {
     private webSocketService: WebSocketService
   ) { }
 
-  get filteredUsers(): User[] {
+  get filteredFriends(): User[] {
     const term = this.userSearchTerm.trim().toLowerCase();
     const list = term
-      ? this.users.filter(user => user.username.toLowerCase().includes(term))
-      : this.users;
+      ? this.friends.filter(user => user.username.toLowerCase().includes(term))
+      : this.friends;
 
-    // NEW: sort by most recent activity, same as the inspo screenshot —
-    // users you've messaged recently float to the top.
+    // Sort by most recent activity — friends you've messaged recently float to the top.
     return [...list].sort((a, b) => {
       const aTime = new Date(this.conversations.get(a._id)?.lastMessageAt || 0).getTime();
       const bTime = new Date(this.conversations.get(b._id)?.lastMessageAt || 0).getTime();
@@ -227,7 +251,9 @@ export class ChatsComponent implements OnInit, OnDestroy {
 
     this.currentUser = JSON.parse(localStorage.getItem("currentUser") || '');
 
-    this.getUsers().then(() => this.fetchConversations());
+    this.getFriends().then(() => this.fetchConversations());
+    this.fetchPendingRequests();
+    this.fetchSentRequests();
 
     // Connect the socket ONCE for the lifetime of this component.
     this.createSocketConnection();
@@ -241,23 +267,126 @@ export class ChatsComponent implements OnInit, OnDestroy {
       socket.off('onlineUsers');
       socket.off('typing');
       socket.off('messagesRead');
+      socket.off('friendRequest');
+      socket.off('friendRequestAccepted');
+      socket.off('friendRemoved');
     } catch (error) {
       // socket already gone, nothing to clean up
     }
   }
 
-  async getUsers() {
+  async getFriends() {
     if (this.currentUser) {
-      const res: any = await this.apiService.get('users');
-      this.users = res.filter((user: any) => user._id !== this.currentUser._id);
+      const res: any = await this.apiService.get('friends?userId=' + this.currentUser._id);
+      this.friends = res?.data || res || [];
     } else {
       console.log("Could not find current user");
     }
   }
 
+  // NEW: pending requests sent TO the current user
+  async fetchPendingRequests() {
+    try {
+      const res: any = await this.apiService.get('friends/requests?userId=' + this.currentUser._id);
+      this.pendingRequests = res?.data || res || [];
+    } catch (error) {
+      console.log('Error fetching pending requests:', error);
+    }
+  }
+
+  // NEW: requests the current user has SENT that are still pending
+  async fetchSentRequests() {
+    try {
+      const res: any = await this.apiService.get('friends/sent?userId=' + this.currentUser._id);
+      this.sentRequests = res?.data || res || [];
+    } catch (error) {
+      console.log('Error fetching sent requests:', error);
+    }
+  }
+
+  // NEW: send a friend request by username
+  async inviteFriend() {
+    const username = this.inviteUsername.trim();
+    if (!username) {
+      return;
+    }
+
+    this.inviteError = '';
+    this.inviteSuccess = '';
+    this.inviteLoading = true;
+
+    try {
+      await this.apiService.post('friends/invite', {
+        fromUserId: this.currentUser._id,
+        username,
+      });
+      this.inviteSuccess = `Friend request sent to ${username}.`;
+      this.inviteUsername = '';
+      await this.fetchSentRequests();
+    } catch (error: any) {
+      this.inviteError = error?.error?.message || error?.message || 'Could not send friend request.';
+    } finally {
+      this.inviteLoading = false;
+    }
+  }
+
+  // NEW: accept or decline a request sent to the current user
+  async respondToRequest(request: PendingRequest, accept: boolean) {
+    try {
+      await this.apiService.post('friends/respond', {
+        requestId: request.requestId,
+        userId: this.currentUser._id,
+        accept,
+      });
+      this.pendingRequests = this.pendingRequests.filter(r => r.requestId !== request.requestId);
+      if (accept) {
+        await this.getFriends();
+      }
+    } catch (error) {
+      console.log('Error responding to friend request:', error);
+    }
+  }
+
+  // NEW: cancel a request the current user sent, before it's answered
+  async cancelSentRequest(request: SentRequest) {
+    try {
+      await this.apiService.delete('friends/requests/' + request.requestId + '?userId=' + this.currentUser._id, {});
+      this.sentRequests = this.sentRequests.filter(r => r.requestId !== request.requestId);
+    } catch (error) {
+      console.log('Error cancelling friend request:', error);
+    }
+  }
+
+  // NEW: removes the currently open friend, with a confirmation prompt
+  // since this is destructive. Drops back to the friends hub afterward.
+  async unfriendUser() {
+    if (!this.selectedUser._id) {
+      return;
+    }
+    const confirmed = window.confirm(`Remove ${this.selectedUser.username} as a friend?`);
+    if (!confirmed) {
+      return;
+    }
+    try {
+      await this.apiService.delete('friends/' + this.selectedUser._id + '?userId=' + this.currentUser._id, {});
+      this.friends = this.friends.filter(f => f._id !== this.selectedUser._id);
+      this.conversations.delete(this.selectedUser._id);
+      this.openFriendsHub();
+    } catch (error) {
+      console.log('Error unfriending:', error);
+    }
+  }
+
+  // NEW: clicking "Add Friend" (or "Manage Invites") should drop back to
+  // the friends dashboard even if a conversation is currently open.
+  openFriendsHub() {
+    this.selectedUserId = '';
+    this.selectedUser = {} as any;
+  }
+
   async onSelectedUserChanged(){
     if(this.selectedUserId) {
-      this.selectedUser = this.users.find((user: User) => user._id === this.selectedUserId) as any;
+      this.selectedUser = this.friends.find((user: User) => user._id === this.selectedUserId) as any;
 
       console.log('USER CHANGED')
       await this.fetchChats();
@@ -280,6 +409,9 @@ export class ChatsComponent implements OnInit, OnDestroy {
 
       socket.off('typing');
       socket.off('messagesRead');
+      socket.off('friendRequest');
+      socket.off('friendRequestAccepted');
+      socket.off('friendRemoved');
       socket.on('message', (message: any) => {
           this.handleSocketMessage(message)
       });
@@ -313,6 +445,27 @@ export class ChatsComponent implements OnInit, OnDestroy {
           this.messages = this.messages.map(m =>
             m.sender === this.currentUser._id ? { ...m, read: true } : m
           );
+        }
+      });
+
+      // NEW: someone just sent us a friend request — refresh the pending list.
+      socket.on('friendRequest', () => {
+        this.fetchPendingRequests();
+      });
+
+      // NEW: someone accepted our friend request — refresh friends + sent list.
+      socket.on('friendRequestAccepted', () => {
+        this.getFriends();
+        this.fetchSentRequests();
+      });
+
+      // NEW: someone removed us as a friend — drop them from our list too,
+      // and back out of the conversation if it was open.
+      socket.on('friendRemoved', (payload: { userId: string }) => {
+        this.friends = this.friends.filter(f => f._id !== payload.userId);
+        this.conversations.delete(payload.userId);
+        if (this.selectedUserId === payload.userId) {
+          this.openFriendsHub();
         }
       });
 
